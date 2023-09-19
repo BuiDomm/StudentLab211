@@ -3,6 +3,7 @@ package Common;
 import java.util.ArrayList;
 import java.util.Random;
 import java.util.Scanner;
+import model.Report;
 import model.Student;
 
 public class Library {
@@ -27,27 +28,27 @@ public class Library {
         System.out.println("");
     }
 
-//    public int checkID(String msg, ArrayList<Candidate> list) {
-//        while (true) {
-//            String id = getValue(msg);
-//
-//            if (checkDuplicateID(list, Integer.parseInt(id)) < 0) {
-//                continue;
-//            }
-//
-//            String sub = id.substring(0);
-//            try {
-//                int out = Integer.parseInt(sub);
-//                if (out < 0) {
-//                    System.out.println("Invalid value. Please enter again.");
-//                    continue;
-//                }
-//                return Integer.parseInt(id);
-//            } catch (Exception e) {
-//                System.out.println("Wrong format");
-//            }
-//        }
-//    }
+    public int checkID(String msg, ArrayList<Student> list) {
+        while (true) {
+            String id = getValue(msg);
+
+            if (checkDuplicateID(list, Integer.parseInt(id)) < 0) {
+                continue;
+            }
+
+            String sub = id.substring(0);
+            try {
+                int out = Integer.parseInt(sub);
+                if (out < 0) {
+                    System.out.println("Invalid value. Please enter again.");
+                    continue;
+                }
+                return Integer.parseInt(id);
+            } catch (Exception e) {
+                System.out.println("Wrong format");
+            }
+        }
+    }
     public String checkEmail(String msg) {
         while (true) {
             int vt = 0;
@@ -70,15 +71,15 @@ public class Library {
         }
     }
 
-//    public int checkDuplicateID(ArrayList<Candidate> list, int id) {
-//        for (Candidate d : list) {
-//            if (d.getCandidateID() == id) {
-//                System.out.println("ID is existed.Enter again.");
-//                continue;
-//            }
-//        }
-//        return id;
-//    }
+    public int checkDuplicateID(ArrayList<Student> list, int id) {
+        for (Student d : list) {
+            if (d.getId()== id) {
+                System.out.println("ID is existed.Enter again.");
+                continue;
+            }
+        }
+        return id;
+    }
     public int autoIncreasingID(ArrayList<Student> st) {
         int id = st.size() + 1;
         return id;
@@ -176,10 +177,19 @@ public class Library {
             String input = getValue(msg);
             if (input.equals("U") || input.equals("D")) {
                 return input;
-
             }
             else continue;
         }
+    }
+        public static boolean checkReportExist(ArrayList<Report> listReports, String name, String course, int total) {
+        for (Report report : listReports) {
+            if (name.equalsIgnoreCase(report.getStuName())
+                    && course.equalsIgnoreCase(report.getCourseName())
+                    && total == report.getTotalCourse()) {
+                return true;
+            }
+        }
+        return false;
     }
 
 }

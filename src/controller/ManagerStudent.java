@@ -7,7 +7,9 @@ package controller;
 import Common.Library;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Scanner;
 import java.util.function.Predicate;
+import model.Report;
 import model.Student;
 import view.Menu;
 
@@ -17,6 +19,7 @@ import view.Menu;
  */
 public class ManagerStudent extends Menu<String> {
 
+    Scanner sc = new Scanner(System.in);
     Library lib = new Library();
     Student st = new Student();
     static String[] choices = {"Create", "Find and Sort", "Update/Date", "Report"};
@@ -53,7 +56,7 @@ public class ManagerStudent extends Menu<String> {
             }
 
             case 2: {
-                     String[] mc = {"Find", "Sort"};
+                String[] mc = {"Find", "Sort"};
 
                 Menu m = new Menu("Find/Sort", mc, "Exit") {
                     @Override
@@ -84,6 +87,10 @@ public class ManagerStudent extends Menu<String> {
                 editStudentByID(id);
                 break;
             }
+            case 4: {
+                report();
+                break;
+            }
         }
 
     }
@@ -100,51 +107,85 @@ public class ManagerStudent extends Menu<String> {
 
     public void displayList(ArrayList<Student> list) {
         for (Student s : list) {
-            System.out.println("Student name: " + s.getStudentName() + "Semester :" + s.getSemester() + "Course name: " + s.getCourseName());
+            System.out.println("Student name: " + s.getStudentName() + "|Semester :" + s.getSemester() + "|Course name: " + s.getCourseName());
         }
     }
 
     public void editStudentByID(int id) {
-        Student s;
         ArrayList<Student> haha = search(st -> st.getId() == id);
         if (haha.isEmpty()) {
             System.out.println("No exists");
         } else {
             String input = lib.checkUD("Do you want to update (U) or delete (D) student.");
-            if (input == "U") {
-                String name = lib.getValue("Input your name:");
-                if (name.isEmpty()) {
-                    name = haha.get(id).getStudentName();
-                }
+            switch (input) {
+                case "U": {
+                    System.out.println("Input your name:");
+                    String name = sc.nextLine();
+                    if (name.isEmpty()) {
+                        name = haha.get(0).getStudentName();
+                    }
+                    System.out.println("Input your Semeter:");
+                    String semesterString = sc.nextLine();
+                    int semester;
 
-                int semester = lib.getInt("Input your semester:");
-                if (semester == haha.get(id).getSemester()) {
-                    semester = haha.get(id).getSemester();
-                }
-                String courseName = lib.getValue("Input course name:");
-                if (courseName.isEmpty()) {
-                    courseName = haha.get(id).getCourseName();
-                }
-                s = new Student(id, name, semester, courseName);
-                listSt.add(s);
+                    if (semesterString.isEmpty()) {
+                        semester = haha.get(0).getSemester();
+                    } else {
+                        semester = Integer.parseInt(semesterString);
+                    }
 
-            } else {
-                haha.remove(id);
+                    System.out.println("Input course name:");
+                    String courseName = sc.nextLine();
+                    if (courseName.isEmpty()) {
+                        courseName = haha.get(0).getCourseName();
+                    }
+                    Student s = new Student(id, name, semester, courseName);
+                    listSt.remove(haha.get(0));
+                    listSt.add(s);
+                    System.out.println("=======List Before to update======");
+                    displayList(listSt);
+                    break;
+                }
+                case "D": {
+                    listSt.remove(haha.get(0));
+                    System.out.println("=======List Before to delete======");
+                    displayList(listSt);
+                    break;
+
+                }
             }
+
         }
     }
 
-    public void report(ArrayList<Student> listSt) {
-        HashMap<String, Integer> map = new HashMap<>();
-        map.put("Java", 1);
-        map.put(".Net", 2);
-        map.put("C/C++", 3);
+    public void report() {
+        ArrayList<Student> stu = listSt;
+        if (stu.isEmpty()) {
+            System.out.println("List is Empty.");
+            return;
+        }
+        ArrayList<Report> listReports = new ArrayList<>();
 
-        for (Student s : listSt) {
-            if (map.containsKey(s.getCourseName())) {
-                int count = 0;
-                count++;
+        for (Student student : stu) {
+            String id = student.getId() + "";
+            String courseName = student.getCourseName();
+            String studentName = student.getCourseName();
+
+            int total = 0;
+
+            for (Student students : stu) {
+                if (studentName.equalsIgnoreCase(students.getStudentName()) && courseName.equalsIgnoreCase(students.getCourseName())) {
+                    total++;
+                }
             }
+
+            if (!lib.checkReportExist(listReports, studentName, courseName, total)) {
+                listReports.add(new Report(studentName, courseName, total));
+            }
+        }
+
+        for (Report report : listReports) {
+            System.out.printf("%-10s|%-5s|%-5d\n", report.getStuName(), report.getCourseName(), report.getTotalCourse());
         }
     }
 }
